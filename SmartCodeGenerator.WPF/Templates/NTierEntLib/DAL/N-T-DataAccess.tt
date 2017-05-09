@@ -1,0 +1,351 @@
+﻿<#@ template debug="false" hostspecific="false" language="CSharp" #>
+<#@ output extension="cs"  #>
+<#@ Assembly Name="System.Xml" #>
+<#@ Assembly Name="System.Data" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Xml" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="SmartCodeGenerator.Uility" #>
+<#@ parameter name="ConnectionStr" type="SmartCodeGenerator.Parameter" #>
+<#@ parameter name="NameSpace" type="SmartCodeGenerator.Parameter" #>
+<#@ parameter name="TableName" type="SmartCodeGenerator.Parameter" #>
+
+//  Copyright © CNSmartCoder. All Rights Reserved.
+// </copyright>
+<#
+SqlDBHelper sqlHelper = new SqlDBHelper(ConnectionStr.Value); 
+CodeGenerateHelper cghelper = new  CodeGenerateHelper(sqlHelper);
+DataTable dt =  cghelper.GetDtColumnsInfo(TableName.Value );
+#>
+using System;
+using System.Text;
+using System.Data;
+using System.Data.SqlClient;
+using System.Data.Common;
+using System.Collections.Generic;
+using System.Collections;
+using Microsoft.Practices.EnterpriseLibrary.Data;
+using <#=NameSpace.Value#>.Common;
+using <#=NameSpace.Value#>.Entities;
+
+namespace <#=NameSpace.Value#>.DataAccess
+{
+	/// <summary> 
+	/// Class  <#=TableName.Value#>Access
+	/// Generated DateTime   <#=DateTime.Now#>
+	/// </summary>
+	public class  <#=TableName.Value#>Access
+	{
+<#
+  StringBuilder pkwSqlStr = new StringBuilder();
+  StringBuilder pkwSqlStr2 = new StringBuilder();
+  StringBuilder pkConditionStr = new StringBuilder();		  
+  StringBuilder pkParameterStr = new StringBuilder();
+  StringBuilder pkParameterValueStr = new StringBuilder();
+  StringBuilder pkVaulesStr = new StringBuilder(); 
+  StringBuilder rowMapperStr = new StringBuilder(); 
+  StringBuilder accessorStr = new StringBuilder(); 
+  
+  StringBuilder allwSqlStr = new StringBuilder();
+  StringBuilder allConditionStr = new StringBuilder();
+  StringBuilder allParameterStr = new StringBuilder();
+  StringBuilder allParameterValueStr = new StringBuilder();
+  StringBuilder populateValueStr = new StringBuilder();
+  
+  int pkCount = 0;
+  
+  rowMapperStr.Append("IRowMapper<"+TableName.Value+"> map = MapBuilder<"+TableName.Value+">.MapAllProperties().");
+  accessorStr.Append("accessor = db.CreateSqlStringAccessor(strSql,MapBuilder<"+TableName.Value+">.MapAllProperties(). ");
+  pkParameterValueStr.Append("new object[]{");
+  for(int i = 0; i < dt.Rows.Count; i++)
+  {
+	  rowMapperStr.Append(Environment.NewLine+"				Map(p => p."+dt.Rows[i]["ColumnName"].ToString()+").ToColumn(\""+dt.Rows[i]["ColumnName"].ToString()+"\").");
+	  accessorStr.Append(Environment.NewLine+" 				Map(p => p."+dt.Rows[i]["ColumnName"].ToString()+").ToColumn(\""+dt.Rows[i]["ColumnName"].ToString()+"\").");
+	  if(populateValueStr.Length >0)
+	  {
+			populateValueStr.Append( ","+Environment.NewLine+"						"+dt.Rows[i]["ColumnName"].ToString()+" = reader.Get"+cghelper.convertToDbType(dt.Rows[i]["DataTypeName"].ToString()) +"("+i.ToString()+")" );
+	  }
+	  else
+	  {
+			populateValueStr.Append( dt.Rows[i]["ColumnName"].ToString()+" = reader.Get"+cghelper.convertToDbType(dt.Rows[i]["DataTypeName"].ToString()) +"("+i.ToString()+")" );
+	  }
+	  	   
+      if(dt.Rows[i]["IsPK"].ToString() == "Y")
+	  {
+		  pkCount = pkCount + 1;
+		  
+		  if(pkConditionStr.Length >0)
+		  {
+				pkConditionStr.Append(","+cghelper.conver(dt.Rows[i]["DataTypeName"].ToString()) +" "+dt.Rows[i]["ColumnName"].ToString().ToLower() );
+		  }
+		  else
+		  {
+			    pkConditionStr.Append(cghelper.conver(dt.Rows[i]["DataTypeName"].ToString()) +" "+dt.Rows[i]["ColumnName"].ToString().ToLower());
+		  }
+		  if(pkwSqlStr.Length >0)
+		  {
+				pkwSqlStr.Append(" and "+ dt.Rows[i]["ColumnName"].ToString() +"=@P"+pkCount.ToString());
+		  }
+		  else
+		  {
+				pkwSqlStr.Append(" " + dt.Rows[i]["ColumnName"].ToString() +"=@P"+pkCount.ToString());
+		  }
+		  if(pkwSqlStr2.Length >0)
+		  {
+				pkwSqlStr2.Append(" and "+ dt.Rows[i]["ColumnName"].ToString() +"=@"+dt.Rows[i]["ColumnName"].ToString());
+		  }
+		  else
+		  {
+				pkwSqlStr2.Append(" " + dt.Rows[i]["ColumnName"].ToString() +"=@"+dt.Rows[i]["ColumnName"].ToString());
+		  }
+
+		  if(pkParameterStr.Length ==0)
+		  {
+				pkParameterStr.Append("db.AddInParameter(cmd, \"@"+ dt.Rows[i]["ColumnName"].ToString() +"\",DbType."+cghelper.convertToDbType(dt.Rows[i]["DataTypeName"].ToString())+","+dt.Rows[i]["ColumnName"].ToString().ToLower()+");"+Environment.NewLine);
+		  }
+		  else
+		  {
+				pkParameterStr.Append("			db.AddInParameter(cmd, \"@"+ dt.Rows[i]["ColumnName"].ToString() +"\",DbType."+cghelper.convertToDbType(dt.Rows[i]["DataTypeName"].ToString())+","+dt.Rows[i]["ColumnName"].ToString().ToLower()+");"+Environment.NewLine);
+		  }
+		  if( pkParameterValueStr.ToString().IndexOf("{") == pkParameterValueStr.ToString().Length-1)
+		  {
+				pkParameterValueStr.Append(dt.Rows[i]["ColumnName"].ToString().ToLower());
+		  }
+		  else
+		  {
+		        pkParameterValueStr.Append(","+dt.Rows[i]["ColumnName"].ToString().ToLower());
+		  }
+	  }	
+	  if(allwSqlStr.Length >0)
+	  {
+		  allwSqlStr.Append(" and "+ dt.Rows[i]["ColumnName"].ToString() +"=@"+dt.Rows[i]["ColumnName"].ToString());
+	  }
+	  else
+	  {
+		  allwSqlStr.Append(" " + dt.Rows[i]["ColumnName"].ToString() +"=@"+dt.Rows[i]["ColumnName"].ToString());
+	  }			  		  
+	  if(allConditionStr.Length >0)
+	  {
+			allConditionStr.Append(","+cghelper.conver(dt.Rows[i]["DataTypeName"].ToString()) +" "+dt.Rows[i]["ColumnName"].ToString().ToLower() );
+	  }
+	  else
+	  {
+		    allConditionStr.Append(cghelper.conver(dt.Rows[i]["DataTypeName"].ToString()) +" "+dt.Rows[i]["ColumnName"].ToString().ToLower());			  
+	  }	   
+	  if(allParameterStr.Length == 0)
+	  {
+			allParameterStr.Append("db.AddInParameter(cmd, \"@"+ dt.Rows[i]["ColumnName"].ToString() +"\",DbType."+cghelper.convertToDbType(dt.Rows[i]["DataTypeName"].ToString())+","+dt.Rows[i]["ColumnName"].ToString().ToLower()+");"+Environment.NewLine);
+	  }
+	  else
+	  {
+			allParameterStr.Append("			db.AddInParameter(cmd, \"@"+ dt.Rows[i]["ColumnName"].ToString() +"\",DbType."+cghelper.convertToDbType(dt.Rows[i]["DataTypeName"].ToString())+","+dt.Rows[i]["ColumnName"].ToString().ToLower()+");"+Environment.NewLine);
+	  }
+  }
+  rowMapperStr.Append("Build();");
+  accessorStr.Append("Build() );");
+  pkParameterValueStr.Append("}");
+  if(pkCount > 0)
+  {
+#>
+		///<summary>
+		/// Exists
+		///</summary>
+		public bool Exists(<#=pkConditionStr.ToString()#>)
+		{
+			Database db = DBHelper.CreateDataBase();
+			string strSql =" select count(1) from [<#=TableName.Value #>] where <#=pkwSqlStr2.ToString()#> ";
+			DbCommand cmd = db.GetSqlStringCommand(strSql); 
+			<#=pkParameterStr.ToString()#>
+			return db.ExecuteNonQuery(cmd) > 0 ? true : false;
+		}
+
+		///<summary>
+		/// Get Entity
+		///</summary>
+		public <#=TableName.Value#> Get<#=TableName.Value#>(<#=pkConditionStr.ToString()#>)
+		{
+			<#=TableName.Value#> model = null;
+			Database db = DBHelper.CreateDataBase();
+			string strSql ="select * from [<#=TableName.Value#>]  where <#=pkwSqlStr2.ToString()#> ";
+			DbCommand cmd = db.GetSqlStringCommand(strSql);
+			<#=pkParameterStr.ToString()#>
+			using (IDataReader reader = db.ExecuteReader(cmd))
+			{
+				while (reader.Read())
+				{
+					model = new <#=TableName.Value#>()
+					{
+						<#=populateValueStr#>
+					};
+				}
+			}
+			return  model;
+		}
+
+		///<summary>
+		/// Delete
+		///</summary>
+		public bool Delete<#=TableName.Value#>(<#=pkConditionStr.ToString()#>)
+		{
+			Database db = DBHelper.CreateDataBase();
+			string strSql ="delete from [<#=TableName.Value#>]  where <#=pkwSqlStr2.ToString()#> ";
+			DbCommand cmd = db.GetSqlStringCommand(strSql);
+			<#=pkParameterStr.ToString()#>
+			return db.ExecuteNonQuery(cmd) > 0 ? true : false; 
+		}
+<#
+  }
+#>
+		///<summary>
+		/// Insert
+		///</summary>
+		public bool Insert<#=TableName.Value#>(<#=TableName.Value#> model)
+		{
+<#
+	string insertSql = "";
+	StringBuilder insertSqlStr = new StringBuilder();	
+	StringBuilder insertSqlStrValues = new StringBuilder();	
+	StringBuilder insertParameterStr = new StringBuilder(); 
+	
+	for(int i = 0; i < dt.Rows.Count; i++)
+	{	
+		if(insertSqlStr.Length>0)
+		{			
+			insertSqlStr.Append(","+dt.Rows[i]["ColumnName"].ToString());
+		}
+		else
+		{
+			insertSqlStr.Append("("+dt.Rows[i]["ColumnName"].ToString());
+		}
+		if(insertSqlStrValues.Length>0)
+		{			
+			insertSqlStrValues.Append(",@"+dt.Rows[i]["ColumnName"].ToString());
+		}
+		else
+		{
+			insertSqlStrValues.Append("(@"+dt.Rows[i]["ColumnName"].ToString());
+		}
+		if(insertParameterStr.Length==0)
+		{
+				insertParameterStr.Append("db.AddInParameter(cmd, \"@"+ dt.Rows[i]["ColumnName"].ToString() +"\",DbType."+cghelper.convertToDbType(dt.Rows[i]["DataTypeName"].ToString())+",model."+dt.Rows[i]["ColumnName"].ToString() +");"+Environment.NewLine);	
+		}
+		else
+		{
+		        insertParameterStr.Append("			db.AddInParameter(cmd, \"@"+ dt.Rows[i]["ColumnName"].ToString() +"\",DbType."+cghelper.convertToDbType(dt.Rows[i]["DataTypeName"].ToString())+",model."+dt.Rows[i]["ColumnName"].ToString()+");"+Environment.NewLine);	
+		}
+		 
+	}
+	insertSqlStr.Append(")");
+	insertSqlStrValues.Append(")");
+	insertSql = "insert into ["+TableName.Value+"]"+insertSqlStr.ToString()+" values "+insertSqlStrValues.ToString(); 
+#>
+			Database db = DBHelper.CreateDataBase();
+			string strSql ="<#=insertSql.ToString()#>";
+			DbCommand cmd = db.GetSqlStringCommand(strSql); 
+			<#=insertParameterStr.ToString()#>
+			return db.ExecuteNonQuery(cmd) > 0 ? true : false;           
+		}
+
+		///<summary>
+		/// Update
+		///</summary>
+		public bool Update<#=TableName.Value#>(<#=TableName.Value#> model)
+		{
+<#
+	string updateSql = ""; 	
+	StringBuilder updateSqlStrValues = new StringBuilder();	
+	StringBuilder updateParameterStr = new StringBuilder();
+    StringBuilder updateParameterValueStr = new StringBuilder();	
+	for(int i = 0; i < dt.Rows.Count; i++)
+	{	 
+		if(updateSqlStrValues.Length>0)
+		{			
+			updateSqlStrValues.Append(","+dt.Rows[i]["ColumnName"].ToString()+"=@"+dt.Rows[i]["ColumnName"].ToString());
+		}
+		else
+		{
+			updateSqlStrValues.Append("("+dt.Rows[i]["ColumnName"].ToString()+"=@"+dt.Rows[i]["ColumnName"].ToString());
+		}
+		if(updateParameterStr.Length == 0)
+		{
+				updateParameterStr.Append("db.AddInParameter(cmd, \"@"+ dt.Rows[i]["ColumnName"].ToString() +"\",DbType."+cghelper.convertToDbType(dt.Rows[i]["DataTypeName"].ToString())+",model."+dt.Rows[i]["ColumnName"].ToString() +");"+Environment.NewLine);			 
+		}
+		else
+		{
+				updateParameterStr.Append("			db.AddInParameter(cmd, \"@"+ dt.Rows[i]["ColumnName"].ToString() +"\",DbType."+cghelper.convertToDbType(dt.Rows[i]["DataTypeName"].ToString())+",model."+dt.Rows[i]["ColumnName"].ToString()+");"+Environment.NewLine);			 
+		}
+	}
+ 
+	updateSqlStrValues.Append(")");
+	updateSql = "update ["+TableName.Value +"] set "+updateSqlStrValues.ToString(); 
+#>
+			Database db = DBHelper.CreateDataBase();
+			string strSql ="<#=updateSql.ToString()#>  where <#=pkwSqlStr2.ToString()#> ";
+			DbCommand cmd = db.GetSqlStringCommand(strSql); 
+			<#=updateParameterStr.ToString()#>
+			return db.ExecuteNonQuery(cmd) > 0 ? true : false; 
+		}
+
+		///<summary>
+		/// Populate
+		///</summary>
+		public List<<#=TableName.Value#>> Populate(List<ParameterPopulate> ppList,string sortField,string sortDirection)
+		{
+			List<<#=TableName.Value#>> list = new List<<#=TableName.Value#>>();
+			Database db = DBHelper.CreateDataBase();
+			string strSql =" select * from [<#=TableName.Value #>] "; 
+			if (ppList != null && ppList.Count >0 )
+			{
+				strSql += " where "; 
+				foreach (ParameterPopulate pp in ppList) 
+				{ 
+					switch (pp.ParOptType) 
+					{ 
+						case OptType.FuzzyQuery: 
+							strSql += pp.ParName + " like @" + pp.ParName; 
+							break; 
+						case OptType.PreciseQuery: 
+							strSql += pp.ParName + " = @" + pp.ParName; 
+							break; 
+						case OptType.GreaterThan: 
+							strSql += pp.ParName + " > @" + pp.ParName; 
+							break; 
+						case OptType.LessThan: 
+							strSql += pp.ParName + " < @" + pp.ParName; 
+							break; 
+						case OptType.NoGreaterThan: 
+							strSql += pp.ParName + " <= @" + pp.ParName; 
+							break; 
+						case OptType.NoLessThan: 
+							strSql += pp.ParName + " >= @" + pp.ParName; 
+							break; 
+					 }  
+				}
+				strSql += " order by " + sortField + " " + sortDirection; 
+			} 
+			DbCommand cmd = db.GetSqlStringCommand(strSql);
+			if( ppList != null) 
+			{  
+				foreach (ParameterPopulate pp in ppList) 
+				{ 
+					if (pp.ParOptType == OptType.FuzzyQuery) 
+					{  
+						pp.ParValue = "%" + pp.ParValue + "%"; 
+					}  
+					db.AddInParameter(cmd, pp.ParName, pp.ParDbType, pp.ParValue); 
+				} 
+			} 
+			using (IDataReader reader = db.ExecuteReader(cmd)) 
+			{ 
+				while (reader.Read()) 
+				{ 
+					list.Add(new <#=TableName.Value#>() 
+					{ 
+						<#=populateValueStr#> 
+					}); 
+				} 
+			} 
+			return list;
+		} 
+	}
+}

@@ -1,0 +1,45 @@
+<#@ template debug="false" hostspecific="false" language="CSharp" #>
+<#@ output extension="cs"  #>
+<#@ Assembly Name="System.Xml" #>
+<#@ Assembly Name="System.Data" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Xml" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="SmartCodeGenerator.Uility" #> 
+<#@ parameter name="NameSpace" type="SmartCodeGenerator.Parameter" #> 
+//  Copyright © CNSmartCoder. All Rights Reserved.
+// </copyright>
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Microsoft.Practices.EnterpriseLibrary.Common.Configuration;
+using Microsoft.Practices.EnterpriseLibrary.Data;
+using Microsoft.Practices.EnterpriseLibrary.Data.Configuration;
+
+namespace <#=NameSpace.Value#>.Common
+{
+    public static class DBHelper
+    {
+        /// <summary>
+        /// Get Database Object
+        /// </summary>
+        /// <param name="name">Database instance name</param>
+        /// <returns>Database Object</returns>
+        public static Database CreateDataBase()
+        {
+            return DatabaseFactory.CreateDatabase(); 
+        }
+        /// <summary>
+        /// Get Database Object
+        /// </summary>
+        /// <param name="name">Database instance name</param>
+        /// <returns>Database Object</returns>
+        public static Database CreateDataBase(string name = "")
+        {
+            return DatabaseFactory.CreateDatabase(name);
+            //return EnterpriseLibraryContainer.Current.GetInstance<Database>(name);
+        }
+    }
+}

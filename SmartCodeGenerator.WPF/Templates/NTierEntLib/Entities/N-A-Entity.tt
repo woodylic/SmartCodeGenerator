@@ -1,0 +1,51 @@
+﻿<#@ template debug="false" hostspecific="false" language="CSharp" #>
+<#@ output extension="cs"  #>
+<#@ Assembly Name="System.Xml" #>
+<#@ Assembly Name="System.Data" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Xml" #>
+<#@ import namespace="SmartCodeGenerator.Uility" #>
+<#@ parameter name="ConnectionStr" type="SmartCodeGenerator.Parameter" #>
+<#@ parameter name="NameSpace" type="SmartCodeGenerator.Parameter" #>
+<#@ parameter name="TableName" type="SmartCodeGenerator.Parameter" #>
+
+//  Copyright © CNSmartCoder. All Rights Reserved.
+// </copyright>
+<#
+SqlDBHelper sqlHelper = new SqlDBHelper(ConnectionStr.Value); 
+CodeGenerateHelper cghelper = new  CodeGenerateHelper(sqlHelper);
+DataTable dt =  cghelper.GetDtColumnsInfo(TableName.Value );
+#>
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Microsoft.Practices.EnterpriseLibrary.Validation.Validators;
+
+namespace <#=NameSpace.Value#>.Entities
+{
+	/// <summary> 
+	/// Class <#=TableName.Value#>
+	/// DateTime <#=DateTime.Now#>
+	/// </summary>
+	[Serializable()]
+	public class  <#=TableName.Value#> : BaseEntity<<#=TableName.Value#>>
+	{
+<#
+	for (int i = 0; i < dt.Rows.Count; i++)
+	{
+#>
+		///<summary>
+		///<#=dt.Rows[i]["ColumnName"].ToString()#>
+		/// </summary>
+		<#=cghelper.GenerateValidateString(dt.Rows[i]) #>
+		public <#=cghelper.conver(dt.Rows[i]["DataTypeName"].ToString()) #>  <#=dt.Rows[i]["ColumnName"].ToString()#>
+		{
+			get;
+			set;        
+		} 
+<#
+	}
+#>
+	}
+}

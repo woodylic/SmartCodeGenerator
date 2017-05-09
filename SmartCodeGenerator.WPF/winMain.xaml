@@ -1,0 +1,241 @@
+﻿<Window x:Class="SmartCodeGenerator.winMain"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ad="clr-namespace:AvalonDock;assembly=AvalonDock"  
+        xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+        xmlns:local="clr-namespace:SmartCodeGenerator"
+        Title="Smart Code Generator 1.0" Icon="images/Logo.png" Height="720" Width="1000" WindowStartupLocation="CenterScreen" WindowState="Maximized"  WindowStyle="ThreeDBorderWindow">
+    <Window.Resources>
+        <LinearGradientBrush x:Key="transparentColor" EndPoint="0.5,1" StartPoint="0.5,0">
+            <GradientStop Color="#2FFFFFFF" Offset="0.469"/>
+            <GradientStop Color="#2FFFFFFF" Offset="0.498"/>
+        </LinearGradientBrush>
+        <ImageBrush x:Key="thumbnailBackground" ImageSource="Images\thumbnail.jpg"/> 
+        <Style x:Key="statusBarItemStyle" TargetType="{x:Type Border}">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver"  Value="true">
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <LinearGradientBrush EndPoint="0.514,0.821" StartPoint="0.514,0.228">
+                                <GradientStop Color="#FF000000" Offset="0"/>
+                                <GradientStop Color="#FF000000" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="BitmapEffect" >
+                        <Setter.Value>
+                            <OuterGlowBitmapEffect GlowColor="Green" GlowSize="20" Noise="0.5"  Opacity="0.4" />
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="OpacityMask">
+                        <Setter.Value>
+                            <LinearGradientBrush EndPoint="0.025,0.49" StartPoint="0.971,0.491">
+                                <GradientStop Color="#8FFFFFFF" Offset="0.469"/>
+                                <GradientStop Color="#8FFFFFFF" Offset="0.498"/>
+                            </LinearGradientBrush>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="shortcutItemStyle" TargetType="{x:Type Border}">
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="CornerRadius" Value="5"/>
+            <Setter Property="Width" Value="80"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver"  Value="true">
+                    <Setter Property="Background" Value="{StaticResource transparentColor}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources> 
+    <DockPanel>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="218*" />
+                <ColumnDefinition Width="760*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="28"/>
+                <RowDefinition Height="32"/>
+                <RowDefinition/>
+                <RowDefinition Height="32"/>
+            </Grid.RowDefinitions>
+            <!-- Toolbar -->
+            <Menu  Grid.Row="0" Grid.ColumnSpan="2" >
+                <MenuItem Header="File"  FontSize="12" Height="28"  VerticalAlignment="Center" >
+                    <MenuItem Header="New"  Click="btnNewDoc_Click"   />
+                    <MenuItem Header="Open" Click="btnOpenDoc_Click"   />
+                    <Separator/>
+                    <MenuItem Header="Save"   Click="btnSaveDoc_Click" />  
+                </MenuItem>
+                <MenuItem  Header="Project" >
+                    <MenuItem Header="Open Project" Click="btnProjOpen_Click"  />
+                    <Separator/>
+                    <MenuItem Header="Add Doc to Project"  Click="btnDocAddToProj_Click"   />
+                    <MenuItem Header="Remove Doc from Project"   Click="btnDocRemoveFormProj_Click"  />                    
+                </MenuItem>
+                <MenuItem Header="View"  >
+                    <MenuItem Header="Show Explorer" 
+                          ItemsSource="{Binding DockableContents, ElementName=DockManager}" 
+                          Click="OnShowDockableContent">
+                        <MenuItem.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Title}"/>
+                            </DataTemplate>
+                        </MenuItem.ItemTemplate>
+                    </MenuItem>
+                    <Separator/>
+                    <MenuItem Header="View Docs" 
+                          ItemsSource="{Binding Documents, ElementName=DockManager}"
+                          Click="OnShowDocumentContent">
+                        <MenuItem.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Title}"/>
+                            </DataTemplate>
+                        </MenuItem.ItemTemplate>
+                    </MenuItem>
+                    <MenuItem Header="Close All Docs" Click="MenuItemCloseAllDocs_Click">
+                        <MenuItem.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="Close All Docs"/>
+                            </DataTemplate>
+                        </MenuItem.ItemTemplate>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="Themes"  FontSize="12" Height="28"  VerticalAlignment="Center" >
+                    <MenuItem Header="Classic" Tag="classic" Click="ChangeStandardTheme"/> 
+                    <MenuItem Header="Generic" Tag="generic" Click="ChangeStandardTheme"/> 
+                </MenuItem>
+                <MenuItem  Header="Help" >
+                    <MenuItem Header="About Smart Code Generator"  Click="AboutMenu_Click" /> 
+                </MenuItem>
+            </Menu>
+            <ToolBar Grid.Row="1" Grid.ColumnSpan="2">
+                <Button  Name="btnProjOpen" ToolTip="Open Project" Click="btnProjOpen_Click"  Height="28" Width="28"   HorizontalContentAlignment="Left"    Cursor="Hand">
+                    <Button.Content>
+                        <Image   Source="Images/OpenProj.png"   ></Image>
+                    </Button.Content>
+                </Button>
+                <Button  Name="btnProjNew" ToolTip="New Project" Click="btnProjNew_Click"  Height="28" Width="28"   HorizontalContentAlignment="Left"    Cursor="Hand">
+                    <Button.Content>
+                        <Image   Source="Images/SolutionTemplate.png"  ></Image>
+                    </Button.Content>
+                </Button> 
+                <Button Name="btnOpenDoc" ToolTip="Open Document" Click="btnOpenDoc_Click"   Height="28" Width="28"   HorizontalContentAlignment="Left"    Cursor="Hand">
+                    <Button.Content>
+                        <Image   Source="Images/Open.png"   ></Image>
+                    </Button.Content>
+                </Button>
+                <Button Name="btnNewDoc" ToolTip="New Document"  Click="btnNewDoc_Click"  Height="28" Width="28"   HorizontalContentAlignment="Left"    Cursor="Hand">
+                    <Button.Content>
+                        <Image   Source="Images/New.png"   ></Image>
+                    </Button.Content>
+                </Button>
+                <Button  Name="btnSaveDoc" ToolTip="Save Document" Click="btnSaveDoc_Click"  Height="28" Width="28"   HorizontalContentAlignment="Left"    Cursor="Hand">
+                    <Button.Content>
+                            <Image   Source="Images/Save.png"   >  </Image> 
+                    </Button.Content>
+                </Button>
+                <Button  Name="btnDeleteDoc" ToolTip="Delete Document"  Click="btnDeleteDoc_Click" Height="28" Width="28"   HorizontalContentAlignment="Left"    Cursor="Hand">
+                    <Button.Content>
+                        <Image   Source="Images/Delete.png"   ></Image>
+                    </Button.Content>
+                </Button>
+                <!--<Separator/>
+                <Button  Name="btnProjNew" ToolTip="New Project" Click="btnProjNew_Click"  Height="28" Width="28"   HorizontalContentAlignment="Left"    Cursor="Hand">
+                    <Button.Content>
+                        <Image   Source="Images/NewProj.png"   ></Image>
+                    </Button.Content>
+                </Button>
+                <Button  Name="btnProjSave" ToolTip="Save Project" Click="btnProjSave_Click"  Height="28" Width="28"   HorizontalContentAlignment="Left"    Cursor="Hand">
+                    <Button.Content>
+                        <Image   Source="Images/SaveProj.png"   ></Image>
+                    </Button.Content>
+                </Button>
+                <Button  Name="btnProjClose" ToolTip="Remove Project" Click="btnProjClose_Click"  Height="28" Width="28"   HorizontalContentAlignment="Left"    Cursor="Hand">
+                    <Button.Content>
+                        <Image   Source="Images/DeleteProj.png"   ></Image>
+                    </Button.Content>
+                </Button>-->
+                <Separator></Separator>
+                <Button  Name="btnGenerateCode" ToolTip="Generate Code "  Click="btnGenerateCode_Click" Height="28" Width="28"   HorizontalContentAlignment="Left"    Cursor="Hand">
+                    <Button.Content>
+                        <Image   x:Name="imgSingle"  Source="Images/SingleGenerate.png"   ></Image>
+                    </Button.Content>
+                </Button>
+                <Button  Name="btnBatchGenerateCode" ToolTip="Batch Generate Code "  Click="btnBatchGenerateCode_Click" Height="28" Width="28"   HorizontalContentAlignment="Left"    Cursor="Hand">
+                    <Button.Content>
+                        <Image  x:Name="imgBatch"  Source="Images/BatchCode.png"   ></Image>
+                    </Button.Content>
+                </Button>
+                <Button  Name="btnExceltoScript" ToolTip="Excel to Sql Script"  Click="btnExceltoScript_Click" Height="28" Width="28"   HorizontalContentAlignment="Left"    Cursor="Hand">
+                    <Button.Content>
+                        <Image  x:Name="imgExceltoScript"  Source="Images/ExceltoScript.png"   ></Image>
+                    </Button.Content>
+                </Button>
+                <Separator/>
+                <Button  Name="btnDocAddToProj" ToolTip="Add Document to Project" Click="btnDocAddToProj_Click"  Height="28" Width="28"   HorizontalContentAlignment="Left"    Cursor="Hand">
+                    <Button.Content>
+                        <Image   Source="Images/AddToProj.png"   ></Image>
+                    </Button.Content>
+                </Button>
+                <Button  Name="btnDocRemoveFromProj" ToolTip="Remove Document from Project" Click="btnDocRemoveFormProj_Click"  Height="28" Width="28"   HorizontalContentAlignment="Left"    Cursor="Hand">
+                    <Button.Content>
+                        <Image   Source="Images/RemoveFromProj.png"   ></Image>
+                    </Button.Content>
+                </Button>
+                
+            </ToolBar>
+            <!--Docking Manager AvalonDock-->
+            <ad:DockingManager x:Name="DockManager" IsAnimationEnabled="True" Grid.Row="2"  Margin="0,4,0,0"  
+                     ActiveContent="{Binding ElementName=Content1}" Grid.ColumnSpan="2">
+                <ad:DockingManager.LayoutTransform>
+                    <ScaleTransform
+                    ScaleX="{Binding Value, ElementName=zoomSlider}"
+                    ScaleY="{Binding Value, ElementName=zoomSlider}"/>
+                </ad:DockingManager.LayoutTransform>
+                <ad:ResizingPanel Orientation="Horizontal">                    
+                    <ad:ResizingPanel ad:ResizingPanel.ResizeWidth="280" Orientation="Vertical">                        
+                        <ad:DockablePane >
+                            <local:ucTemplatesExplorer   x:Name="lucTemplatesExplorer" Title="Templates Explorer"></local:ucTemplatesExplorer>
+                        </ad:DockablePane>
+                        <ad:DockablePane >
+                            <local:ucServerExplorer    x:Name="lucServerExplorer"  Title="Server Explorer"></local:ucServerExplorer>
+                        </ad:DockablePane>
+                    </ad:ResizingPanel>
+                    <ad:ResizingPanel ad:ResizingPanel.ResizeWidth="*" Orientation="Vertical"  > 
+                           <ad:ResizingPanel  ad:ResizingPanel.ResizeWidth="1*" Orientation="Vertical"> 
+                               <ad:DocumentPane x:Name="DocumentHost" SelectionChanged="DocumentHost_SelectionChanged">  
+                                <local:ucBaseDocument x:Name ="InitNewDocument" Title="New Document" DocType="CodeDocument" >
+                                    <avalonEdit:TextEditor  IsReadOnly="False"  FontFamily="Consolas"  FontSize="10pt"   SyntaxHighlighting="XML">
+                                        
+                                    </avalonEdit:TextEditor>
+                                </local:ucBaseDocument>
+                            </ad:DocumentPane>
+                     </ad:ResizingPanel>  
+                    </ad:ResizingPanel>
+                    <ad:ResizingPanel ad:ResizingPanel.ResizeWidth="280" Orientation="Vertical">
+                        <ad:DockablePane >
+                            <local:ucSolutionExplorer  x:Name="lucSolutionExplorer" Title="Solution Explorer"></local:ucSolutionExplorer>
+                        </ad:DockablePane>
+                        <ad:DockablePane   >
+                            <local:ucParameterExplorer x:Name="lucDocumentProperties" Title="Document Properties" IsCloseable="True"></local:ucParameterExplorer>
+                        </ad:DockablePane>
+                    </ad:ResizingPanel>
+                </ad:ResizingPanel>
+            </ad:DockingManager>
+
+            <!-- Status Bar -->
+            <StatusBar Grid.Row="3" Grid.ColumnSpan="2">
+                <StatusBarItem>
+                    <StackPanel Orientation="Horizontal" >
+                        <TextBlock Text="A" VerticalAlignment="Center"/>
+                        <Slider x:Name="zoomSlider" VerticalAlignment="Center" Value="1" IsSnapToTickEnabled="True" TickFrequency="0.2" TickPlacement="Both" Minimum="0.5" Maximum="3" SmallChange="0.5" LargeChange="0.5" Width="100"/>
+                        <TextBlock Text="A" FontSize="20" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </StatusBarItem>
+            </StatusBar>
+        </Grid>
+    </DockPanel>
+</Window>

@@ -1,0 +1,105 @@
+<#@ template debug="false" hostspecific="false" language="CSharp" #>
+<#@ output extension="cs"  #>
+<#@ Assembly Name="System.Xml" #>
+<#@ Assembly Name="System.Data" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Xml" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="SmartCodeGenerator.Uility" #> 
+<#@ parameter name="NameSpace" type="SmartCodeGenerator.Parameter" #> 
+//  Copyright © CNSmartCoder. All Rights Reserved.
+// </copyright>
+ 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Web;
+using System.Web.UI;
+using Microsoft.Practices.EnterpriseLibrary.Security.Cryptography;
+
+namespace <#=NameSpace.Value#>.Common
+{
+    public static class Utils
+    {
+        public static void WriteToCookie(int sid, string uid, string isAdmin, int expires)
+        {
+            HttpCookie cookie = new HttpCookie("entlib");
+            cookie.Values["sid"] = sid.ToString();
+            cookie.Values["uid"] = uid;
+            cookie.Values["isadmin"] = isAdmin;
+            cookie.Expires = DateTime.Now.AddMinutes(expires);
+            HttpContext.Current.Response.Cookies.Add(cookie);
+        }
+
+        public static string GetCookies(string name)
+        {
+            if (HttpContext.Current.Request.Cookies != null && HttpContext.Current.Request.Cookies["entlib"] != null && HttpContext.Current.Request.Cookies["entlib"][name] != null)
+            {
+                return HttpContext.Current.Request.Cookies["entlib"][name];
+            }
+            return "";
+        }
+
+        public static void ClearCookie()
+        {
+            HttpCookie cookie = new HttpCookie("entlib");
+            cookie.Values.Clear();
+            cookie.Expires = DateTime.Now.AddYears(-1);
+            HttpContext.Current.Response.Cookies.Add(cookie);
+        }
+
+        public static void MessageBox(Page page, string msg, string redirectUrl = "")
+        {
+            if (page == null)
+            {
+                throw new ArgumentNullException("Page is null");
+            }
+            if (!string.IsNullOrEmpty(redirectUrl))
+            {
+
+                redirectUrl = "location.href='" + page.ResolveClientUrl(redirectUrl) + "'";
+            }
+            msg = "alert('" + msg + "');";
+            page.ClientScript.RegisterStartupScript(page.ClientScript.GetType(), "msg", msg + redirectUrl, true);
+        }
+
+        public static string GetBetweenString(string str, string beginTag, string endTag)
+        {
+            int startIndex = str.IndexOf(beginTag);
+            int endIndex = str.LastIndexOf(endTag);
+            int length = endIndex - (startIndex + 1);
+
+            return length == -1 ? "" : str.Substring(startIndex + 1, length);
+        }
+
+        public static string GetBetweenString(string str, string beginTag, string endTag, int beginOffset)
+        {
+            int startIndex = str.IndexOf(beginTag);
+            int endIndex = str.LastIndexOf(endTag);
+            int length = endIndex - (startIndex);
+
+            return length == -1 ? "" : str.Substring(startIndex + beginOffset, length - beginOffset);
+        }
+
+        public static string Encode(string instance, string encryptString)
+        {
+            return Cryptographer.EncryptSymmetric(instance, encryptString);
+        }
+
+        public static string Decode(string instance, string decryptString)
+        {
+            return Cryptographer.DecryptSymmetric(instance, decryptString);
+        }
+
+        public static string CreateHash(string instance, string plaintString)
+        {
+            return Cryptographer.CreateHash(instance, plaintString);
+        }
+
+        public static bool CompareHash(string instance, string plaintString, string hashedString)
+        {
+            return Cryptographer.CompareHash(instance, plaintString, hashedString);
+        }
+    }
+}

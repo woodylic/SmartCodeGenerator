@@ -1,0 +1,360 @@
+﻿<#@ template debug="false" hostspecific="false" language="CSharp" #>
+<#@ output extension="sql"  #>
+<#@ Assembly Name="System.Xml" #>
+<#@ Assembly Name="System.Data" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Xml" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="SmartCodeGenerator.Uility" #>
+<#@ parameter name="ConnectionStr" type="SmartCodeGenerator.Parameter" #>
+<#@ parameter name="NameSpace" type="SmartCodeGenerator.Parameter" #>
+<#@ parameter name="TableName" type="SmartCodeGenerator.Parameter" #>
+
+--  Copyright © CNSmartCoder. All Rights Reserved.
+-- </copyright>
+<#
+  CodeGenerateHelper cghelper = new  CodeGenerateHelper();
+  SqlDBHelper sqlHelper = new SqlDBHelper();
+  sqlHelper.SqlConnectionString = ConnectionStr.Value;
+  DataTable dt = sqlHelper.GetTables("select * from [" + TableName.Value + "]");
+  DataTable pkdt = sqlHelper.GetPKs(  TableName.Value );
+  dt = cghelper.GetColumnsInfo(dt,pkdt);
+ 		  
+  StringBuilder pkwSqlStr = new StringBuilder();
+
+  StringBuilder pkParameterStr = new StringBuilder();
+  StringBuilder pkParameterValueStr = new StringBuilder();
+ 
+  StringBuilder insertFieldStr = new StringBuilder();
+  StringBuilder insertParameterStr = new StringBuilder();
+
+  StringBuilder updateSetValuesStr = new StringBuilder();
+
+  StringBuilder allParameterStr = new StringBuilder();
+  StringBuilder allParameterValueStr = new StringBuilder();
+
+  StringBuilder tempTbColsStr = new StringBuilder();
+  StringBuilder optionalParameterValueStr = new StringBuilder();
+  StringBuilder sqlSortStr = new StringBuilder();
+
+  StringBuilder keyVarList = new StringBuilder();
+
+  for(int i = 0; i < dt.Rows.Count; i++)
+  {
+      if(dt.Rows[i]["IsPK"].ToString() == "Y")
+	  {		 
+		  if(pkParameterStr.Length >0)
+		  {
+				pkParameterStr.Append(","+Environment.NewLine+ "@"+ dt.Rows[i]["ColumnName"].ToString() +" "+dt.Rows[i]["DataTypeName"].ToString()+"("+dt.Rows[i]["ColumnSize"].ToString()+")");
+		  }
+		  else
+		  {
+				pkParameterStr.Append("@"+ dt.Rows[i]["ColumnName"].ToString() +" "+dt.Rows[i]["DataTypeName"].ToString()+"("+dt.Rows[i]["ColumnSize"].ToString()+")");
+		  }
+		  if(pkwSqlStr.Length >0)
+		  {
+				pkwSqlStr.Append(" and "+ dt.Rows[i]["ColumnName"].ToString() +"=@"+dt.Rows[i]["ColumnName"].ToString());
+		  }
+		  else
+		  {
+				pkwSqlStr.Append(" " + dt.Rows[i]["ColumnName"].ToString() +"=@"+dt.Rows[i]["ColumnName"].ToString());
+		  }
+		  
+	  }	
+	  if(insertFieldStr.Length >0)
+	  {
+		  insertFieldStr.Append(","+ dt.Rows[i]["ColumnName"].ToString());
+	  }
+	  else
+	  {
+		  insertFieldStr.Append( dt.Rows[i]["ColumnName"].ToString());
+	  }	
+	  if(insertParameterStr.Length >0)
+	  {
+		  insertParameterStr.Append(",@"+ dt.Rows[i]["ColumnName"].ToString());
+	  }
+	  else
+	  {
+		  insertParameterStr.Append("@"+ dt.Rows[i]["ColumnName"].ToString());
+	  }		  		  		  
+	  if(allParameterStr.Length >0)
+	  {
+		   allParameterStr.Append(","+Environment.NewLine+ "@"+ dt.Rows[i]["ColumnName"].ToString() +" "+dt.Rows[i]["DataTypeName"].ToString()+"("+dt.Rows[i]["ColumnSize"].ToString()+")");
+	  }
+	  else
+	  {
+			allParameterStr.Append("@"+ dt.Rows[i]["ColumnName"].ToString() +" "+dt.Rows[i]["DataTypeName"].ToString()+"("+dt.Rows[i]["ColumnSize"].ToString()+")");
+	  }
+	  if(updateSetValuesStr.Length >0)
+	  {
+			updateSetValuesStr.Append(" and "+ dt.Rows[i]["ColumnName"].ToString() +"=@"+dt.Rows[i]["ColumnName"].ToString());
+	  }
+	  else
+	  {
+		    updateSetValuesStr.Append(" " + dt.Rows[i]["ColumnName"].ToString() +"=@"+dt.Rows[i]["ColumnName"].ToString());
+	  }
+	  if(tempTbColsStr.Length >0)
+	  {
+			tempTbColsStr.Append( Environment.NewLine+"				"+ dt.Rows[i]["ColumnName"].ToString() +" "+dt.Rows[i]["DataTypeName"].ToString()+"("+dt.Rows[i]["ColumnSize"].ToString()+")");
+	  }
+	  else
+	  {
+		    tempTbColsStr.Append("				"+dt.Rows[i]["ColumnName"].ToString() +" "+dt.Rows[i]["DataTypeName"].ToString()+"("+dt.Rows[i]["ColumnSize"].ToString()+")" +",");
+	  }
+	  if(dt.Rows[i]["DataTypeName"].ToString() == "varchar" ||dt.Rows[i]["DataTypeName"].ToString() == "nvarchar" || dt.Rows[i]["DataTypeName"].ToString() == "char" || dt.Rows[i]["DataTypeName"].ToString() == "nchar" )
+	  {	
+			if(optionalParameterValueStr.Length >0)
+			{
+				optionalParameterValueStr.Append( Environment.NewLine+"				if @"+ dt.Rows[i]["ColumnName"].ToString() +"=''    SET @"+dt.Rows[i]["ColumnName"].ToString()+"=NULL");
+			}
+			else
+			{
+				optionalParameterValueStr.Append("				if @"+ dt.Rows[i]["ColumnName"].ToString() +"=''    SET @"+dt.Rows[i]["ColumnName"].ToString()+"=NULL" );
+			}			
+	  }
+	  if(sqlSortStr.Length >0)
+	  {
+			sqlSortStr.Append( Environment.NewLine+"				WHEN  '"+ dt.Rows[i]["ColumnName"].ToString() +"'    THEN  '"+dt.Rows[i]["ColumnName"].ToString()+"'   +@p_SortDirection");
+	  }
+	  else
+	  {
+			sqlSortStr.Append("				WHEN  '"+ dt.Rows[i]["ColumnName"].ToString() +"'    THEN  '"+dt.Rows[i]["ColumnName"].ToString()+"'   +@p_SortDirection" );
+	  }	  
+	  if(keyVarList.Length >0)
+	  {
+			sqlSortStr.Append(","+dt.Rows[i]["ColumnName"].ToString());
+	  }
+	  else
+	  {
+			sqlSortStr.Append(dt.Rows[i]["ColumnName"].ToString());
+	  }
+  }
+
+#>
+
+
+/******************************************************************
+* TableName：<#=TableName.Value#>
+* Generated Date： <#=DateTime.Now#>
+******************************************************************/
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Exist<#=TableName.Value#>]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[Exist<#=TableName.Value#>]
+GO
+
+CREATE PROCEDURE Exist<#=TableName.Value#>
+<#=pkParameterStr.ToString()#>
+AS
+	DECLARE @TempID int
+	SELECT @TempID = count(1) FROM [<#=TableName.Value#>] WHERE <#=pkwSqlStr#> 
+	IF @TempID = 0
+		RETURN 0
+	ELSE
+		RETURN 1
+
+GO
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Get<#=TableName.Value#>]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[Get<#=TableName.Value#>]
+GO
+ 
+CREATE PROCEDURE Get<#=TableName.Value#>
+<#=pkParameterStr.ToString()#>
+ AS 
+	SELECT 
+	*
+	 FROM [<#=TableName.Value#>]
+	 WHERE <#=pkwSqlStr.ToString()#> 
+
+GO
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Populate<#=TableName.Value#>]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[Populate<#=TableName.Value#>]
+GO
+ 
+CREATE PROCEDURE Populate<#=TableName.Value#>
+<#=allParameterStr.ToString()#>
+@p_CurrPageNum			int				= NULL,
+@p_PageSize				int				= NULL, 
+@p_SortField			varchar(100)	= NULL,
+@p_SortDirection		varchar(4)		= NULL 
+
+ AS 
+BEGIN
+	BEGIN TRY
+    --Declare and set variables	
+	DECLARE @strSQL_Count				varchar(20),
+			@strSQL_Insert				varchar(max),
+			@strSQL_FromMainTable		varchar(max),
+			@strSQL_KeyVarList			varchar(max),
+			@strSQL_Sort				varchar(200),
+			@strSQL_SortList			varchar(200),
+			@strSQL_Where				varchar(max),
+            @strSQL_LeaseItemOR			varchar(max),
+			@strSQL_FilterJoins			varchar(max),
+			@strRowNumData				varchar(max),
+			@begRowRange				int,
+			@endRowRange				int,
+			@rowCount					int
+
+	-- Set Optional Parameter Values
+<#=optionalParameterValueStr.ToString()#>
+	-- Set Default Parameter Values	 
+	IF @p_CurrPageNum	IS NULL OR @p_CurrPageNum = ''	OR @p_CurrPageNum = 0		SET @p_CurrPageNum = 1
+	IF @p_PageSize		IS NULL OR @p_PageSize = ''   	OR @p_PageSize = 0			SET @p_PageSize = 50
+	IF @p_SortField		IS NULL OR @p_SortField = ''								SET @p_SortField = ' '
+	IF @p_SortDirection	IS NULL														SET @p_SortDirection = ' ASC '
+
+    SET @begRowRange = 0
+
+    IF OBJECT_ID('tempdb..#tblSearch') IS NOT NULL 
+		DROP TABLE dbo.#tblSearch
+    --	Declare a temporary table that will store the result set based on the parameters 
+    CREATE TABLE #tblSearch
+	(		  
+				RowNum	 int null,
+<#=tempTbColsStr.ToString()#>
+	)
+
+    /****************************************************************************************/
+	/* Build Sort string.  Key words indicate page-specific sort criteria					*/
+	/****************************************************************************************/
+	SET @strSQL_Sort = (SELECT CASE @p_SortField 
+<#=sqlSortStr.ToString()#>
+        ELSE  @p_SortField
+     END)
+
+	/****************************************************************************************/
+	/* Set @begRowRange and @endRowRange based on CurrPageNum and PageSize					*/
+	/****************************************************************************************/
+	SET @begRowRange = ((@p_CurrPageNum - 1) * @p_PageSize) + 1
+	SET @endRowRange = @begRowRange + @p_PageSize - 1
+	/****************************************************************************************/
+	/* Key variable list includes 1) key values that uniquely identify the record;			*/
+	/*	2) parameter variables needed for filtering and sorting and 3) any other display	*/
+	/*	variables that can be picked up from joined tables.  Note table alias adjoined.		*/
+	/****************************************************************************************/
+	SET @strSQL_KeyVarList = ' <#=keyVarList.ToString()#> '
+
+	/****************************************************************************************/
+	/* Set up SQL pieces		                 */
+	/****************************************************************************************/
+	SET @strSQL_Count = ' SELECT COUNT(*) ' 
+    SET @strSQL_FromMainTable = ' FROM <#=TableName.Value#> WITH(NOLOCK) '
+		 
+    SET @strSQL_Where =  ' where 1=1 '
+
+<#
+  for(int i = 0; i < dt.Rows.Count; i++)
+  {
+#>
+	IF @<#=dt.Rows[i]["ColumnName"].ToString()#> IS NOT NULL
+		BEGIN
+<#
+	   string tmpDataType = cghelper.conver(dt.Rows[i]["DataTypeName"].ToString()) ;
+	   if(tmpDataType== "string" )
+	   {
+#>
+		IF CHARINDEX('%',@<#=dt.Rows[i]["ColumnName"].ToString()#>) = 0
+			BEGIN
+				SET @strSQL_Where = @strSQL_Where + ' and <#=dt.Rows[i]["ColumnName"].ToString()#> = ''' + @<#=dt.Rows[i]["ColumnName"].ToString()#> + ''' ' 
+			END
+		ELSE
+			BEGIN
+				SET @strSQL_Where =@strSQL_Where + ' and <#=dt.Rows[i]["ColumnName"].ToString()#> Like ''' + @<#=dt.Rows[i]["ColumnName"].ToString()#> + ''' ' 
+			END	
+		END   
+<#
+       } 
+	   else
+	   {
+#>
+	   IF @<#=dt.Rows[i]["ColumnName"].ToString()#> IS NOT NULL 
+	   BEGIN
+			Set @strSQL_Where = @strSQL_Where +  N' and <#=dt.Rows[i]["ColumnName"].ToString()#> = ''' + @<#=dt.Rows[i]["ColumnName"].ToString()#>+''' '
+	   END
+<#
+	   }
+  }
+#>
+
+	/********************************************************************************************/
+	/* Build RowNumData based on sort, filter, and page.  Key and sort variables are included	*/
+	/********************************************************************************************/
+    SET @strRowNumData = ' ( SELECT  '
+
+    SET @strRowNumData =  @strRowNumData + ' TOP ' + cast(@endRowRange as varchar) 
+    SET @strRowNumData =  @strRowNumData  + ' ROW_NUMBER() OVER(ORDER BY ' + @strSQL_Sort + ' ) as RowNum, ' +
+						  @strSQL_KeyVarList + ' ' + 
+						  @strSQL_FromMainTable +  ' ' +
+						  @strSQL_Where 
+ 
+    SET @strRowNumData = @strRowNumData + ' ORDER BY  ' + @strSQL_Sort
+    SET @strRowNumData = @strRowNumData + ') lt '
+    SET @strSQL_Insert =  'INSERT INTO #tblSearch' +  ' SELECT lt.* FROM ' + @strRowNumData	 
+    SET @strSQL_Insert = @strSQL_Insert + '  WHERE RowNum BETWEEN ' + cast(@begRowRange as varchar) + ' AND ' + cast(@endRowRange as varchar)
+    /****************************************************************************************/
+    /* Fill of temp table with data from current page										*/
+    /****************************************************************************************/	
+    EXEC (@strSQL_Insert)
+    /****************************************************************************************/
+    /* Return 1st Dataset:	All data needed to display current page							*/
+	/* If Excel, don't select hidden columns												*/
+	/****************************************************************************************/
+	select * from #tblSearch
+	/****************************************************************************************/
+	/* Return 2nd Dataset:	Count of Total Number of records produced by user filter		*/
+	/****************************************************************************************/     
+    EXEC ( @strSQL_Count  + @strSQL_FromMainTable  + @strSQL_Where )
+
+	IF OBJECT_ID('tempdb..#tblSearch') IS NOT NULL 
+		DROP TABLE #tblSearch 
+
+ 	END TRY
+	BEGIN CATCH	
+	--Handle any T-SQL errors and raise them back to the client by calling the GLR_sp_RethrowError stored procedure.	
+	IF OBJECT_ID('tempdb..#tblSearch') IS NOT NULL 
+		DROP TABLE dbo.#tblSearch 
+
+	IF ERROR_NUMBER() IS NULL
+		RETURN
+
+    DECLARE 
+        @ErrorMessage    NVARCHAR(4000),
+        @ErrorNumber     INT,
+        @ErrorSeverity   INT,
+        @ErrorState      INT,
+        @ErrorLine       INT,
+        @ErrorProcedure  NVARCHAR(200)
+
+    -- Assign variables to error-handling functions that 
+    -- capture information for RAISERROR.
+    SELECT 
+        @ErrorNumber = ERROR_NUMBER(),
+        @ErrorSeverity = ERROR_SEVERITY(),
+        @ErrorState = ERROR_STATE(),
+        @ErrorLine = ERROR_LINE(),
+        @ErrorProcedure = ISNULL(ERROR_PROCEDURE(), '-')
+
+    -- Build the message string that will contain original
+    -- error information.
+    SELECT @ErrorMessage =    N'Error %d, Level %d, State %d, Procedure %s, Line %d, ' +    'Message: '+ ERROR_MESSAGE()
+
+    -- Raise an error: msg_str parameter of RAISERROR will contain
+    -- the original error information.
+    RAISERROR 
+    (
+        @ErrorMessage, 
+        @ErrorSeverity, 
+        1,               
+        @ErrorNumber,    -- parameter: original error number.
+        @ErrorSeverity,  -- parameter: original error severity.
+        @ErrorState,     -- parameter: original error state.
+        @ErrorProcedure, -- parameter: original error procedure name.
+        @ErrorLine       -- parameter: original error line number.
+      )	
+	END CATCH		
+END
+
+
+	 

@@ -1,0 +1,129 @@
+﻿<#@ template debug="false" hostspecific="false" language="CSharp" #>
+<#@ output extension="cs"  #>
+<#@ Assembly Name="System.Xml" #>
+<#@ Assembly Name="System.Data" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Xml" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="SmartCodeGenerator.Uility" #>
+<#@ parameter name="ConnectionStr" type="SmartCodeGenerator.Parameter" #>
+<#@ parameter name="NameSpace" type="SmartCodeGenerator.Parameter" #>
+<#@ parameter name="TableName" type="SmartCodeGenerator.Parameter" #>
+
+//  Copyright © CNSmartCoder. All Rights Reserved.
+// </copyright>
+<#
+SqlDBHelper sqlHelper = new SqlDBHelper(ConnectionStr.Value); 
+CodeGenerateHelper cghelper = new  CodeGenerateHelper(sqlHelper);
+DataTable dt =  cghelper.GetDtColumnsInfo(TableName.Value );
+#>
+
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Data;
+using System.Linq;
+using System.Data.SqlClient;
+using <#=NameSpace.Value#>.Entities;
+using <#=NameSpace.Value#>.DataAccess;
+using <#=NameSpace.Value#>.Common;
+
+namespace <#=NameSpace.Value#>.BizLogic
+{
+	/// <summary> 
+	/// Class  <#=TableName.Value#>Logic
+	/// Generated DateTime   <#=DateTime.Now#>
+	/// </summary>
+	public class <#=TableName.Value#>Logic
+	{
+		 private static <#=TableName.Value#>Access dal = new <#=TableName.Value#>Access();
+<#
+ 
+  StringBuilder pkConditionStr = new StringBuilder();		  
+  StringBuilder pkValueStr = new StringBuilder();
+
+  StringBuilder allConditionStr = new StringBuilder();		  
+  StringBuilder allValueStr = new StringBuilder();
+
+  for(int i = 0; i < dt.Rows.Count; i++)
+  {
+      if(dt.Rows[i]["IsPK"].ToString() == "Y")
+	  {
+		  if(pkConditionStr.Length >0)
+		  {
+				pkConditionStr.Append(","+cghelper.conver(dt.Rows[i]["DataTypeName"].ToString()) +" "+dt.Rows[i]["ColumnName"].ToString().ToLower() );
+				pkValueStr.Append("," +dt.Rows[i]["ColumnName"].ToString().ToLower() );
+		  }
+		  else
+		  {
+			    pkConditionStr.Append(cghelper.conver(dt.Rows[i]["DataTypeName"].ToString()) +" "+dt.Rows[i]["ColumnName"].ToString().ToLower());
+				pkValueStr.Append( dt.Rows[i]["ColumnName"].ToString().ToLower());
+		  }
+	  }		
+	  if(allConditionStr.Length >0)
+	  {
+		  allConditionStr.Append(","+cghelper.conver(dt.Rows[i]["DataTypeName"].ToString()) +" "+dt.Rows[i]["ColumnName"].ToString().ToLower() );
+		  allValueStr.Append("," +dt.Rows[i]["ColumnName"].ToString().ToLower() );
+	  }
+	  else
+	  {
+		  allConditionStr.Append(cghelper.conver(dt.Rows[i]["DataTypeName"].ToString()) +" "+dt.Rows[i]["ColumnName"].ToString().ToLower());
+		  allValueStr.Append( dt.Rows[i]["ColumnName"].ToString().ToLower());
+	   }  
+  }
+  if(pkConditionStr.Length>0)
+  {
+#>
+		///<summary>
+		/// Exists
+		///</summary>
+		public bool Exists(<#=pkConditionStr.ToString()#>)
+		{ 
+			return dal.Exists(<#=pkValueStr.ToString()#>);
+		}
+
+		///<summary>
+		/// Get Entity
+		///</summary>
+		public <#=TableName.Value#> Get<#=TableName.Value#>(<#=pkConditionStr.ToString()#>)
+		{
+			 return dal.Get<#=TableName.Value#>(<#=pkValueStr.ToString()#>);
+		}
+
+		///<summary>
+		/// Delete
+		///</summary>
+		public bool Delete<#=TableName.Value#>(<#=pkConditionStr.ToString()#>)
+		{
+			return dal.Delete<#=TableName.Value#>(<#=pkValueStr.ToString()#>);
+		}
+<#
+  }
+#>
+		///<summary>
+		/// Add
+		///</summary>
+		public bool Insert<#=TableName.Value#>(<#=TableName.Value#> model)
+		{
+			 return dal.Insert<#=TableName.Value#>(model);        
+		}
+
+		///<summary>
+		/// Update
+		///</summary>
+		public bool Update<#=TableName.Value#>(<#=TableName.Value#> model)
+		{
+			 return dal.Update<#=TableName.Value#>(model);   
+		}
+
+		///<summary>
+		/// Populate
+		///</summary>
+		public List<<#=TableName.Value#>> Populate(List<ParameterPopulate> ppList,int pageIndex,int pageSize,string sortField,string sortDirection,out int count)
+		{
+			List<<#=TableName.Value#>> list = dal.Populate(ppList,sortField,sortDirection); 
+			count = uList.Count<User>();
+			return list.Skip<<#=TableName.Value#>>(pageIndex * pageSize).Take(pageSize).ToList();		
+		}
+	}
+}

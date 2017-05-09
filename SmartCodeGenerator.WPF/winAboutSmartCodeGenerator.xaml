@@ -1,0 +1,18 @@
+﻿<Window x:Class="SmartCodeGenerator.winAboutSmartCodeGenerator"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="About Smart Code Generator"  Icon="images/Logo.png"  Height="240" Width="360"   WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"></RowDefinition>
+            <RowDefinition Height="20"></RowDefinition>
+            <RowDefinition Height="120"></RowDefinition> 
+        </Grid.RowDefinitions>
+        <Image Height="67" HorizontalAlignment="Left" Margin="22,11,0,0" Name="image1" Stretch="Fill" VerticalAlignment="Top" Width="65" Source="/SmartCodeGenerator;component/Images/Logo.png" />
+        <Label Content="Smart Code Generator v1.0" Height="28" HorizontalAlignment="Right" Margin="0,49,20,0" Name="label1" VerticalAlignment="Top" FontWeight="Bold" FontSize="15" />
+        <Label Content="Robert Fang" Grid.Row="2" Height="28" HorizontalAlignment="Left" Margin="145,8,0,0" Name="label2" VerticalAlignment="Top" FontSize="12" />
+        <Label Content="@2010 CNSmartCoder" FontSize="12" Height="28" HorizontalAlignment="Left" Margin="143,34,0,0" Name="label3" VerticalAlignment="Top" Grid.Row="2" />
+        <Label Content="All rights reserved" FontSize="12" Height="28" HorizontalAlignment="Left" Margin="147,59,0,0" Name="label4" VerticalAlignment="Top" Grid.Row="2" />
+        <Separator Grid.Row="1" Width="300"></Separator>
+    </Grid>
+</Window>

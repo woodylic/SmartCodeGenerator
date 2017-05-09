@@ -1,0 +1,41 @@
+<#@ template debug="false" hostspecific="false" language="CSharp" #>
+<#@ output extension="cs"  #>
+<#@ Assembly Name="System.Xml" #>
+<#@ Assembly Name="System.Data" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Xml" #>
+<#@ import namespace="SmartCodeGenerator.Uility" #>
+<#@ parameter name="ConnectionStr" type="SmartCodeGenerator.Parameter" #>
+<#@ parameter name="NameSpace" type="SmartCodeGenerator.Parameter" #>
+<#@ parameter name="TableName" type="SmartCodeGenerator.Parameter" #>
+
+//  Copyright © CNSmartCoder. All Rights Reserved.
+// </copyright>
+ 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+using Microsoft.Practices.EnterpriseLibrary.Validation;
+
+namespace <#=NameSpace.Value#>.Entities
+{
+    [Serializable]
+    public abstract class BaseEntity<T> where T : class
+    {
+        public string ValidateTag { get; protected set; }
+
+        public virtual bool IsValid()
+        {
+            var validateResults = Validation.Validate<T>(this as T);
+            if (!validateResults.IsValid)
+            {
+                foreach (var item in validateResults)
+                    ValidateTag += string.Format(@"{0}:{1}\n", item.Key, item.Message);
+                return false;
+            }
+            return true;
+        }
+    }
+}

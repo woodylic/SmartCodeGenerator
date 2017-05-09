@@ -1,0 +1,29 @@
+﻿<ad:DockableContent x:Class="SmartCodeGenerator.ucTemplatesExplorer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ad="clr-namespace:AvalonDock;assembly=AvalonDock"
+             xmlns:local="clr-namespace:SmartCodeGenerator"
+             mc:Ignorable="d" 
+             d:DesignHeight="400" d:DesignWidth="260">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="24"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <ToolBar Grid.Row="0" VerticalAlignment="Top" Height="24">
+            <Button Click="LoadTemplate_Click">Load Templates</Button>
+        </ToolBar>
+        <TreeView Grid.Row="1" Name="tvTemplates" SelectedItemChanged="tvTemplates_SelectedItemChanged"> 
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type local:PropertyNodeItem}"  ItemsSource="{Binding Path=Children}">
+                    <StackPanel Orientation="Horizontal" ToolTip="{Binding Value}">
+                        <Image VerticalAlignment="Center" Source="{Binding Icon}" Width="16" Height="16" Margin="0,0,2,2"  ></Image>
+                        <TextBlock VerticalAlignment="Center" Text="{Binding DisplayName}"   ></TextBlock>                       
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+    </Grid>
+</ad:DockableContent>

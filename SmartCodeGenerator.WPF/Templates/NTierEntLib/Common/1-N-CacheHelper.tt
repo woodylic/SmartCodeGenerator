@@ -1,0 +1,90 @@
+<#@ template debug="false" hostspecific="false" language="CSharp" #>
+<#@ output extension="cs"  #>
+<#@ Assembly Name="System.Xml" #>
+<#@ Assembly Name="System.Data" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Xml" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="SmartCodeGenerator.Uility" #> 
+<#@ parameter name="NameSpace" type="SmartCodeGenerator.Parameter" #> 
+//  Copyright © CNSmartCoder. All Rights Reserved.
+// </copyright>
+ 
+using System;
+using System.Text;
+using System.Data;
+using System.Data.SqlClient;
+using Microsoft.Practices.EnterpriseLibrary.Caching;
+using Microsoft.Practices.EnterpriseLibrary.Caching.Expirations;
+using <#=NameSpace.Value#>.Entities;
+namespace <#=NameSpace.Value#>.Common
+{
+    public static class CacheHelper
+    {
+        //ICacheManager cache = EnterpriseLibraryContainer.Current.GetInstance<ICacheManager>();
+        private static ICacheManager cache = CacheFactory.GetCacheManager();
+
+        /// <summary>
+        /// Add Cache
+        /// </summary>
+        /// <param name="key">Key</param>
+        /// <param name="value">Value</param>
+        /// <param name="isRefresh">Is refresh or not</param>
+        public static void Add(string key, object value, bool isRefresh = false)
+        {
+            if (isRefresh)
+            {
+                //self setting,If expired will automatically reload,Overdue time is 5 minutes
+                cache.Add(key, value, CacheItemPriority.Normal, new MyCacheItemRefreshAction(), new AbsoluteTime(TimeSpan.FromMinutes(5)));
+            }
+            else
+            {
+                cache.Add(key, value);
+            }
+        }
+
+        /// <summary>
+        /// Get cache object
+        /// </summary>
+        /// <param name="key">Key</param>
+        /// <returns></returns>
+        public static object GetCache(string key)
+        {
+            return cache.GetData(key);
+        }
+
+        /// <summary>
+        /// Remove cache object
+        /// </summary>
+        /// <param name="key">key</param>
+        public static void RemoveCache(string key)
+        {
+            cache.Remove(key);
+        }
+    }
+
+    /// <summary>
+    /// Self setting cache refresh operation 
+    /// </summary>
+    [Serializable]
+    public class MyCacheItemRefreshAction : ICacheItemRefreshAction
+    {
+        #region ICacheItemRefreshAction menber
+        /// <summary>
+        /// Self define refresh operation
+        /// </summary>
+        /// <param name="removedKey">remove key</param>
+        /// <param name="expiredValue">expired value</param>
+        /// <param name="removalReason">remove reason</param>
+        void ICacheItemRefreshAction.Refresh(string removedKey, object expiredValue, CacheItemRemovedReason removalReason)
+        {
+            if (removalReason == CacheItemRemovedReason.Expired)
+            {
+                ICacheManager cache = CacheFactory.GetCacheManager();
+                cache.Add(removedKey, expiredValue);
+            }
+        }
+
+        #endregion
+    }
+}

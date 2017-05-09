@@ -1,0 +1,54 @@
+﻿<Window x:Class="SmartCodeGenerator.winExcelToScript"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:SmartCodeGenerator"
+        Title="Excel To Script" Height="450" Width="720"   Icon="images/Logo.png"  WindowStartupLocation="CenterScreen"  ResizeMode="NoResize">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" MinHeight="26" />
+            <RowDefinition/>
+            <RowDefinition Height="200"/>
+        </Grid.RowDefinitions>
+        <ToolBar Height="26" Grid.Column="0"  Grid.Row="0" Name="toolBar1" VerticalAlignment="Top">
+            <Button Click="btnOpen_Click" ToolTip="Select Excel File">
+                <Button.Content >
+                    <Image  x:Name="imgFolder"  Source="Images/Folder.png"   ></Image>                   
+                </Button.Content> 
+            </Button>
+            <Button Click="btnOpen_Click" ToolTip="Select Excel File" >
+                <Button.Content >
+                    Open Excel File
+                </Button.Content>
+            </Button>
+        </ToolBar>
+        <TreeView Name="tvSheets" VerticalContentAlignment="Stretch" Width="Auto" Grid.Column="0" Grid.Row="1" Grid.RowSpan="3" SelectedItemChanged="tvSheets_SelectedItemChanged" />
+        <GridSplitter Name="gridSplitter1" Width="5" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" />
+        <ListView Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Name="lvSheetData">
+            <ListView.View>
+                <GridView  />
+            </ListView.View>
+        </ListView>
+        <Grid Grid.Row="2" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition/> 
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="38"/>
+                <RowDefinition Height="162*" />
+            </Grid.RowDefinitions>
+            <Label Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Right">Table Name</Label>
+            <TextBox Grid.Column="1" Name="txtTableName" VerticalAlignment="Center" Margin="0,8,6,8" />
+            <WrapPanel Grid.Column="2" Grid.Row="0" VerticalAlignment="Center"></WrapPanel>
+            <Label Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,4,0,0">Primary Key</Label>
+            <ListBox Grid.Column="1" Grid.Row="1" Name="listPrimaryKey" SelectionMode="Multiple" VerticalAlignment="Top" MinWidth="150" MinHeight="100" Margin="0,10,6,0"></ListBox>
+            <Button Name="btnGenerateSql" Click="btnGenerateSql_Click" VerticalAlignment="Center" Margin="242,130,6,10" Grid.Column="1" Grid.Row="1">Generate</Button>
+            <RadioButton Name="rbInsert" IsChecked="True" GroupName="sqlType" VerticalAlignment="Center" Margin="31,131,288,15" Grid.Column="1" Grid.Row="1">INSERT</RadioButton>
+            <RadioButton Name="rbUpdate" GroupName="sqlType" VerticalAlignment="Center" Grid.Column="1" Margin="133,135,186,11" Grid.Row="1">UPDATE</RadioButton>
+        </Grid>
+    </Grid>
+</Window>

@@ -1,0 +1,328 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{62A9A4B1-9A86-4BC9-986E-6D16600BC701}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SmartCodeGenerator</RootNamespace>
+    <AssemblyName>SmartCodeGenerator</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Logo.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AvalonDock, Version=1.3.3590.0, Culture=neutral, PublicKeyToken=85a1e0ada7ec13e4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\AvalonDock.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.AvalonEdit">
+      <HintPath>..\SmartCodeGenerator.Library\ICSharpCode.AvalonEdit.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\SmartCodeGenerator.Library\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.SQLDMO">
+      <HintPath>..\SmartCodeGenerator.Library\Interop.SQLDMO.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.TextTemplating.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\SmartCodeGenerator.Library\Microsoft.VisualStudio.TextTemplating.10.0.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.TextTemplating.Interfaces.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\SmartCodeGenerator.Library\Microsoft.VisualStudio.TextTemplating.Interfaces.10.0.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="T4Toolbox.10.0, Version=10.3.7.1, Culture=neutral, PublicKeyToken=7e313accbcce84dc, processorArchitecture=x86" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="Uility\CustomProperty\CustomProperty.cs" />
+    <Compile Include="Uility\CustomProperty\CustomPropertyCollection.cs" />
+    <Compile Include="Uility\CustomProperty\CustomPropertyDescriptor.cs" />
+    <Compile Include="ucBaseDocument.xaml.cs">
+      <DependentUpon>ucBaseDocument.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ucParameterExplorer.xaml.cs">
+      <DependentUpon>ucParameterExplorer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ucServerExplorer.xaml.cs">
+      <DependentUpon>ucServerExplorer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ucSolutionExplorer.xaml.cs">
+      <DependentUpon>ucSolutionExplorer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ucTemplatesExplorer.xaml.cs">
+      <DependentUpon>ucTemplatesExplorer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Uility\CodeGenerateHelper.cs" />
+    <Compile Include="Uility\ExcelToScript\SqlGenerator.cs" />
+    <Compile Include="Uility\ExcelToScript\Workbook.cs" />
+    <Compile Include="Uility\ExcelToScript\WorkbookConnectionFactory.cs" />
+    <Compile Include="Uility\Parameter.cs" />
+    <Compile Include="Uility\SqlDBHelper.cs" />
+    <Compile Include="Uility\TextTemplatingEngineHost.cs" />
+    <Compile Include="Uility\ToolHelper.cs" />
+    <Compile Include="Uility\TreeViewTools.cs" />
+    <Compile Include="Uility\ZipHelper.cs" />
+    <Compile Include="winAboutSmartCodeGenerator.xaml.cs">
+      <DependentUpon>winAboutSmartCodeGenerator.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="winBatchGenerator.xaml.cs">
+      <DependentUpon>winBatchGenerator.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="winConnector.xaml.cs">
+      <DependentUpon>winConnector.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="winExcelToScript.xaml.cs">
+      <DependentUpon>winExcelToScript.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="winMain.xaml.cs">
+      <DependentUpon>winMain.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="winOpenFolder.xaml.cs">
+      <DependentUpon>winOpenFolder.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="winProjTemplateGenerator.xaml.cs">
+      <DependentUpon>winProjTemplateGenerator.xaml</DependentUpon>
+    </Compile>
+    <Page Include="ucBaseDocument.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ucParameterExplorer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ucServerExplorer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ucSolutionExplorer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ucTemplatesExplorer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="winAboutSmartCodeGenerator.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="winBatchGenerator.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="winConnector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="winExcelToScript.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="winMain.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="winOpenFolder.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="winProjTemplateGenerator.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\default.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\thumbnail.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Batch.png" />
+    <Resource Include="Images\Logo.png" />
+    <Resource Include="Images\Single.png" />
+    <Resource Include="Images\Template.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Connect.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Logo.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\props.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\view_remove.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\view_tree.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\alert.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\file-manager.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\database.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\date.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\demo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\display.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\FolderClosed.png" />
+    <Resource Include="Images\FolderOpen.png" />
+    <Resource Include="Icons\Logo.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Table.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\View.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Generate.png" />
+    <Resource Include="Images\New.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Delete.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Open.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\AddToProj.png" />
+    <Resource Include="Images\DeleteProj.png" />
+    <Resource Include="Images\NewProj.png" />
+    <Resource Include="Images\OpenProj.png" />
+    <Resource Include="Images\RemoveFromProj.png" />
+    <Resource Include="Images\SaveAll.png" />
+    <Resource Include="Images\SaveProj.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Proj.png" />
+    <Resource Include="Images\Solution.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Folder.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Code.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\BatchCode.png" />
+    <Resource Include="Images\SingleGenerate.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\SolutionTemplate.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Templates\NTierEntLib\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ExceltoScript.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
